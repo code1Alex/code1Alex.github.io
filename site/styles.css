@@ -1,0 +1,322 @@
+:root {
+  color-scheme: dark;
+  --ink: #080a12;
+  --gold: #d8b46a;
+  --paper: #f4e7c7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  background: var(--ink);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+  color: var(--paper);
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 48%, rgba(86, 60, 63, 0.28), transparent 70%),
+    radial-gradient(ellipse 40% 35% at 80% 20%, rgba(48, 60, 91, 0.22), transparent 70%),
+    #070910;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#app {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+}
+
+#frame {
+  position: relative;
+  width: min(calc(100vw - 36px), calc((100vh - 84px) * 16 / 9), 1440px);
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0b0e18;
+  box-shadow:
+    0 0 0 1px rgba(216, 180, 106, 0.24),
+    0 0 0 5px rgba(8, 10, 18, 0.92),
+    0 0 0 6px rgba(216, 180, 106, 0.12),
+    0 28px 90px rgba(0, 0, 0, 0.66),
+    0 0 120px rgba(189, 104, 63, 0.08);
+}
+
+#frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.026), transparent 12%, transparent 86%, rgba(0, 0, 0, 0.22));
+  z-index: 2;
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  cursor: default;
+  touch-action: none;
+}
+
+#game.playing {
+  cursor: crosshair;
+}
+
+#page-hint {
+  margin: 0;
+  color: rgba(229, 213, 181, 0.5);
+  font-size: clamp(10px, 0.9vw, 13px);
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+}
+
+#rotate-hint {
+  display: none;
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  place-items: center;
+  padding: 24px;
+  background: rgba(7, 9, 16, 0.92);
+  color: #e7d7b4;
+  font-size: 17px;
+  line-height: 1.8;
+  text-align: center;
+  letter-spacing: 0.12em;
+}
+
+#rotate-hint span {
+  display: inline-block;
+  margin-top: 6px;
+  color: rgba(231, 215, 180, 0.58);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.touch-ui {
+  display: none;
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding:
+    max(10px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 58%, rgba(4, 6, 11, 0.22));
+}
+
+.touch-move,
+.touch-actions {
+  display: flex;
+  pointer-events: none;
+}
+
+.touch-move {
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.touch-actions {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 9px;
+}
+
+.touch-row {
+  display: flex;
+  gap: 9px;
+  align-items: flex-end;
+}
+
+.touch-btn {
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: clamp(54px, 9.4vw, 78px);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1.5px solid rgba(222, 186, 113, 0.44);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 231, 181, 0.12), transparent 44%),
+    rgba(7, 10, 17, 0.72);
+  color: #ead7b2;
+  box-shadow:
+    0 3px 14px rgba(0, 0, 0, 0.38),
+    inset 0 0 14px rgba(216, 179, 109, 0.06);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  transition: transform 80ms ease, background 80ms ease, border-color 80ms ease;
+  font-family: inherit;
+}
+
+.touch-btn .glyph {
+  font-family: "STKaiti", "KaiTi", "Songti SC", serif;
+  font-size: clamp(21px, 3.2vw, 31px);
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 0 14px rgba(255, 208, 129, 0.2);
+}
+
+.touch-btn small {
+  font-size: clamp(8px, 1.1vw, 10px);
+  color: rgba(232, 216, 186, 0.52);
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
+.touch-btn.pressed {
+  transform: scale(0.91);
+  border-color: rgba(255, 226, 156, 0.92);
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 233, 183, 0.25), transparent 50%),
+    rgba(84, 57, 31, 0.82);
+}
+
+.touch-btn[data-key="KeyJ"] {
+  width: clamp(64px, 11.2vw, 92px);
+  border-color: rgba(255, 207, 112, 0.62);
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255, 226, 155, 0.2), transparent 48%),
+    rgba(45, 28, 17, 0.78);
+}
+
+.touch-btn[data-key="KeyJ"] .glyph {
+  font-size: clamp(27px, 4.1vw, 39px);
+  color: #ffe1a0;
+}
+
+.touch-btn[data-key="KeyK"] {
+  border-color: rgba(255, 161, 90, 0.5);
+}
+
+.touch-btn[data-key="KeyL"] {
+  border-color: rgba(255, 124, 72, 0.5);
+}
+
+.touch-btn[data-key="KeyU"] {
+  border-color: rgba(255, 216, 122, 0.55);
+}
+
+.touch-btn[data-key="ShiftLeft"] {
+  border-color: rgba(115, 213, 203, 0.46);
+}
+
+.touch-btn[data-key="Space"] {
+  border-color: rgba(178, 198, 221, 0.42);
+}
+
+.small-row .touch-btn {
+  width: clamp(44px, 7.6vw, 62px);
+}
+
+.small-row .touch-btn .glyph {
+  font-size: clamp(17px, 2.6vw, 24px);
+}
+
+.touch-btn.locked {
+  opacity: 0.38;
+  border-color: rgba(150, 145, 132, 0.3);
+}
+
+.touch-btn.ready {
+  border-color: rgba(255, 226, 146, 0.92);
+  box-shadow:
+    0 0 22px rgba(255, 200, 92, 0.22),
+    inset 0 0 18px rgba(255, 200, 92, 0.12);
+  animation: touch-ready 1.8s ease-in-out infinite;
+}
+
+@keyframes touch-ready {
+  0%,
+  100% {
+    box-shadow:
+      0 0 18px rgba(255, 200, 92, 0.16),
+      inset 0 0 16px rgba(255, 200, 92, 0.08);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(255, 210, 110, 0.32),
+      inset 0 0 20px rgba(255, 200, 92, 0.16);
+  }
+}
+
+@media (pointer: coarse) {
+  body {
+    background: #05070c;
+  }
+
+  #app {
+    gap: 0;
+    padding: 0;
+  }
+
+  #frame {
+    width: min(100vw, calc(100vh * 16 / 9));
+    width: min(100vw, calc(100dvh * 16 / 9));
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  #page-hint {
+    display: none;
+  }
+
+  body.touch-active .touch-ui {
+    display: flex;
+  }
+}
+
+@media (pointer: coarse) and (orientation: portrait) {
+  #rotate-hint {
+    display: grid;
+  }
+
+  body.touch-active .touch-ui {
+    display: none;
+  }
+}
+
+@media (max-width: 780px) and (orientation: portrait) {
+  #frame {
+    width: calc(100vw - 20px);
+  }
+
+  #rotate-hint {
+    display: grid;
+  }
+
+  #page-hint {
+    display: none;
+  }
+
+  #app {
+    padding: 10px;
+  }
+}
