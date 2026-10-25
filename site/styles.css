@@ -1,0 +1,436 @@
+:root {
+  color-scheme: dark;
+  --ink: #080a12;
+  --gold: #d8b46a;
+  --paper: #f4e7c7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  background: var(--ink);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+  color: var(--paper);
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 48%, rgba(86, 60, 63, 0.28), transparent 70%),
+    radial-gradient(ellipse 40% 35% at 80% 20%, rgba(48, 60, 91, 0.22), transparent 70%),
+    #070910;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#app {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+}
+
+#frame {
+  position: relative;
+  width: min(calc(100vw - 36px), calc((100vh - 84px) * 16 / 9), 1440px);
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0b0e18;
+  box-shadow:
+    0 0 0 1px rgba(216, 180, 106, 0.24),
+    0 0 0 5px rgba(8, 10, 18, 0.92),
+    0 0 0 6px rgba(216, 180, 106, 0.12),
+    0 28px 90px rgba(0, 0, 0, 0.66),
+    0 0 120px rgba(189, 104, 63, 0.08);
+}
+
+#frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.026), transparent 12%, transparent 86%, rgba(0, 0, 0, 0.22));
+  z-index: 2;
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  cursor: default;
+  touch-action: none;
+}
+
+#game.playing {
+  cursor: crosshair;
+}
+
+#page-hint {
+  margin: 0;
+  color: rgba(229, 213, 181, 0.5);
+  font-size: clamp(10px, 0.9vw, 13px);
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+}
+
+#rotate-hint {
+  display: none;
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  place-items: center;
+  padding: 24px;
+  background: rgba(7, 9, 16, 0.92);
+  color: #e7d7b4;
+  font-size: 17px;
+  line-height: 1.8;
+  text-align: center;
+  letter-spacing: 0.12em;
+}
+
+#rotate-hint span {
+  display: inline-block;
+  margin-top: 6px;
+  color: rgba(231, 215, 180, 0.58);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+
+/* ---------------------------------------------------------------- touch */
+.touch-ui {
+  display: none;
+  pointer-events: none;
+}
+
+.touch-move,
+.touch-actions {
+  display: flex;
+  pointer-events: none;
+}
+
+.touch-move {
+  gap: 7px;
+  align-items: flex-end;
+}
+
+.touch-actions {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.touch-row {
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+}
+
+.touch-btn {
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 52px;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1.5px solid rgba(222, 186, 113, 0.44);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 231, 181, 0.12), transparent 44%),
+    rgba(7, 10, 17, 0.78);
+  color: #ead7b2;
+  box-shadow:
+    0 3px 14px rgba(0, 0, 0, 0.38),
+    inset 0 0 14px rgba(216, 179, 109, 0.06);
+  transition: transform 80ms ease, background 80ms ease, border-color 80ms ease;
+  font-family: inherit;
+}
+
+.touch-btn .glyph {
+  font-family: "STKaiti", "KaiTi", "Songti SC", serif;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 0 14px rgba(255, 208, 129, 0.2);
+}
+
+.touch-btn small {
+  font-size: 9px;
+  color: rgba(232, 216, 186, 0.52);
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
+.touch-btn.pressed {
+  transform: scale(0.91);
+  border-color: rgba(255, 226, 156, 0.92);
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 233, 183, 0.25), transparent 50%),
+    rgba(84, 57, 31, 0.82);
+}
+
+.touch-btn[data-key="KeyJ"] {
+  border-color: rgba(255, 207, 112, 0.62);
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255, 226, 155, 0.2), transparent 48%),
+    rgba(45, 28, 17, 0.8);
+}
+
+.touch-btn[data-key="KeyJ"] .glyph {
+  font-size: 27px;
+  color: #ffe1a0;
+}
+
+.touch-btn[data-key="KeyK"] {
+  border-color: rgba(255, 161, 90, 0.5);
+}
+
+.touch-btn[data-key="KeyL"] {
+  border-color: rgba(255, 124, 72, 0.5);
+}
+
+.touch-btn[data-key="KeyU"] {
+  border-color: rgba(255, 216, 122, 0.55);
+}
+
+.touch-btn[data-key="ShiftLeft"] {
+  border-color: rgba(115, 213, 203, 0.46);
+}
+
+.touch-btn[data-key="Space"] {
+  border-color: rgba(178, 198, 221, 0.42);
+}
+
+.touch-btn.locked {
+  opacity: 0.38;
+  border-color: rgba(150, 145, 132, 0.3);
+}
+
+.touch-btn.ready {
+  border-color: rgba(255, 226, 146, 0.92);
+  box-shadow:
+    0 0 22px rgba(255, 200, 92, 0.22),
+    inset 0 0 18px rgba(255, 200, 92, 0.12);
+  animation: touch-ready 1.8s ease-in-out infinite;
+}
+
+@keyframes touch-ready {
+  0%,
+  100% {
+    box-shadow:
+      0 0 18px rgba(255, 200, 92, 0.16),
+      inset 0 0 16px rgba(255, 200, 92, 0.08);
+  }
+  50% {
+    box-shadow:
+      0 0 30px rgba(255, 210, 110, 0.32),
+      inset 0 0 20px rgba(255, 200, 92, 0.16);
+  }
+}
+
+@media (pointer: coarse) {
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+  }
+
+  body {
+    background: #05070c;
+    overscroll-behavior: none;
+  }
+
+  #app {
+    width: 100vw;
+    height: 100dvh;
+    min-height: 0;
+    padding: 0;
+    gap: 0;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #frame {
+    width: min(100vw, calc(100dvh * 16 / 9));
+    max-height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  #page-hint {
+    display: none;
+  }
+
+  .touch-ui {
+    display: none;
+  }
+
+  body.touch-active #app {
+    display: grid;
+    grid-template-columns: clamp(96px, 12vw, 112px) minmax(0, 1fr) clamp(156px, 19vw, 196px);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 6px;
+    padding:
+      max(4px, env(safe-area-inset-top))
+      max(4px, env(safe-area-inset-right))
+      max(4px, env(safe-area-inset-bottom))
+      max(4px, env(safe-area-inset-left));
+  }
+
+  body.touch-active #touch-ui {
+    display: contents;
+  }
+
+  body.touch-active #frame {
+    grid-column: 2;
+    grid-row: 1;
+    width: min(100%, calc((100dvh - 8px) * 16 / 9));
+    max-height: calc(100dvh - 8px);
+    border-radius: 6px;
+    box-shadow:
+      0 0 0 1px rgba(216, 180, 106, 0.2),
+      0 0 36px rgba(0, 0, 0, 0.5);
+    justify-self: center;
+    align-self: center;
+  }
+
+  body.touch-active .touch-move,
+  body.touch-active .touch-actions {
+    grid-row: 1;
+    align-self: end;
+    justify-self: center;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+
+  body.touch-active .touch-move {
+    grid-column: 1;
+  }
+
+  body.touch-active .touch-actions {
+    grid-column: 3;
+  }
+
+  .touch-move .touch-btn {
+    width: clamp(42px, 5.1vw, 50px);
+  }
+
+  .touch-actions .touch-btn {
+    width: clamp(44px, 5.4vw, 56px);
+  }
+
+  .touch-actions .touch-btn.pause {
+    width: clamp(34px, 4vw, 42px);
+    align-self: flex-end;
+    border-color: rgba(198, 185, 160, 0.24);
+    opacity: 0.75;
+  }
+
+  .touch-actions .touch-btn.pause .glyph {
+    font-size: clamp(14px, 1.8vw, 18px);
+    color: rgba(230, 216, 190, 0.65);
+  }
+
+  .touch-actions .touch-btn.pause small {
+    display: none;
+  }
+
+  .touch-actions .touch-btn[data-key="KeyJ"] {
+    width: clamp(58px, 7vw, 72px);
+  }
+
+  .small-row .touch-btn {
+    width: clamp(38px, 4.6vw, 46px);
+  }
+
+  .touch-btn .glyph {
+    font-size: clamp(19px, 2.7vw, 27px);
+  }
+
+  .small-row .touch-btn .glyph {
+    font-size: clamp(16px, 2.1vw, 21px);
+  }
+
+  .touch-btn small {
+    font-size: clamp(8px, 1vw, 10px);
+  }
+}
+
+@media (pointer: coarse) and (orientation: portrait) {
+  #rotate-hint {
+    display: grid;
+  }
+
+  body.touch-active #app {
+    display: flex;
+    padding: 10px;
+    gap: 0;
+  }
+
+  body.touch-active #touch-ui {
+    display: none;
+  }
+
+  body.touch-active #frame {
+    width: calc(100vw - 20px);
+    max-height: none;
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 780px) and (orientation: portrait) {
+  #frame {
+    width: calc(100vw - 20px);
+  }
+
+  #rotate-hint {
+    display: grid;
+  }
+
+  #page-hint {
+    display: none;
+  }
+
+  #app {
+    padding: 10px;
+  }
+}
+
+.touch-util {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  body.touch-active .touch-util {
+    display: grid;
+    place-items: center;
+    width: clamp(34px, 4vw, 42px);
+    height: clamp(34px, 4vw, 42px);
+    align-self: flex-end;
+    border: 1px solid rgba(198, 185, 160, 0.24);
+    border-radius: 50%;
+    color: rgba(230, 216, 190, 0.65);
+    background: rgba(10, 12, 16, 0.58);
+    font-family: "STKaiti", "KaiTi", serif;
+    font-size: clamp(12px, 1.5vw, 15px);
+    opacity: 0.75;
+  }
+}
